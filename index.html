@@ -1,13 +1,60 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <meta name="description" content="基于TMDB API的现代化电影资讯网站，提供最新、最全面的电影信息">
+    <meta name="keywords" content="电影,影评,TMDB,电影推荐,电影搜索">
+    <title>电影资讯 - 发现精彩电影世界</title>
+
+    <!-- DNS预解析优化 -->
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//api.themoviedb.org">
+    <link rel="dns-prefetch" href="//image.tmdb.org">
+
+    <!-- CDN预加载（生产环境注入） -->
+    <%- cdnPreload %>
+
+    <!-- 性能优化 -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
+    <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- 应用加载占位 -->
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #64748b;
+        font-family: system-ui, -apple-system, sans-serif;
+      ">
+        <div style="
+          width: 48px;
+          height: 48px;
+          border: 4px solid #e2e8f0;
+          border-top: 4px solid #3b82f6;
+          border-radius: 50%;
+          margin: 0 auto 16px;
+          animation: spin 1s linear infinite;
+        "></div>
+        <div>加载中...</div>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+
+    <!-- CDN脚本（生产环境注入） -->
+    <%- cdnScripts %>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

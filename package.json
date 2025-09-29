@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:cdn": "vite build && node scripts/setup-cdn.mjs",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix",
     "format": "prettier --write src/"
@@ -34,6 +35,7 @@
     "unplugin-auto-import": "^20.2.0",
     "unplugin-vue-components": "^29.1.0",
     "vite": "^7.0.6",
+    "vite-plugin-html": "^3.2.2",
     "vite-plugin-vue-devtools": "^8.0.0"
   }
 }

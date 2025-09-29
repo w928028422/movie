@@ -3,11 +3,23 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { createHtmlPlugin } from 'vite-plugin-html'
 
 // Element Plus 按需导入
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+// CDN配置
+const USE_CDN = process.env.NODE_ENV === 'production'
+
+const CDN_LINKS = USE_CDN ? [
+  // Cloudflare CDN - 全球最快的CDN网络
+  'https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.15/vue.global.prod.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/vue-router/4.2.5/vue-router.global.prod.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pinia/2.1.7/pinia.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js'
+] : []
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -21,6 +33,23 @@ export default defineConfig({
     }),
     Components({
       resolvers: [ElementPlusResolver()],
+    }),
+
+    // HTML插件 - 注入CDN链接
+    createHtmlPlugin({
+      inject: {
+        data: {
+          // CDN预加载链接
+          cdnPreload: USE_CDN ? CDN_LINKS.map(url =>
+            `<link rel="preload" href="${url}" as="script" crossorigin>`
+          ).join('\n    ') : '',
+
+          // CDN脚本链接
+          cdnScripts: USE_CDN ? CDN_LINKS.map(url =>
+            `<script src="${url}" crossorigin></script>`
+          ).join('\n    ') : ''
+        }
+      }
     }),
   ],
   resolve: {
@@ -37,17 +66,27 @@ export default defineConfig({
     sourcemap: false,
     // 代码分割优化
     rollupOptions: {
+      // 外部化依赖，使用CDN
+      external: USE_CDN ? [
+        'vue',
+        'vue-router',
+        'pinia',
+        'axios'
+      ] : [],
+
       output: {
+        // CDN全局变量映射
+        globals: USE_CDN ? {
+          'vue': 'Vue',
+          'vue-router': 'VueRouter',
+          'pinia': 'Pinia',
+          'axios': 'axios'
+        } : {},
+
         // 手动分包策略
         manualChunks: {
-          // Vue 生态系统
-          'vue-vendor': ['vue', 'vue-router', 'pinia'],
-
           // Element Plus UI 库
           'element-plus': ['element-plus'],
-
-          // 工具库
-          'utils': ['axios'],
         },
 
         // 文件命名策略
