@@ -3,23 +3,11 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { createHtmlPlugin } from 'vite-plugin-html'
 
 // Element Plus 按需导入
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
-// CDN配置
-const USE_CDN = process.env.NODE_ENV === 'production'
-
-const CDN_LINKS = USE_CDN ? [
-  // UNPKG CDN - 更可靠的公共CDN
-  'https://unpkg.com/vue@3.4.15/dist/vue.global.prod.js',
-  'https://unpkg.com/vue-router@4.2.5/dist/vue-router.global.prod.js',
-  'https://unpkg.com/pinia@2.1.7/dist/pinia.iife.prod.js',
-  'https://unpkg.com/axios@1.6.5/dist/axios.min.js'
-] : []
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -34,23 +22,6 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-
-    // HTML插件 - 注入CDN链接
-    createHtmlPlugin({
-      inject: {
-        data: {
-          // CDN预加载链接
-          cdnPreload: USE_CDN ? CDN_LINKS.map(url =>
-            `<link rel="preload" href="${url}" as="script" crossorigin>`
-          ).join('\n    ') : '',
-
-          // CDN脚本链接
-          cdnScripts: USE_CDN ? CDN_LINKS.map(url =>
-            `<script src="${url}" crossorigin></script>`
-          ).join('\n    ') : ''
-        }
-      }
-    }),
   ],
   resolve: {
     alias: {
@@ -64,29 +35,22 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    // 代码分割优化
+    // 代码分割优化（回到本地打包方案）
     rollupOptions: {
-      // 外部化依赖，使用CDN
-      external: USE_CDN ? [
-        'vue',
-        'vue-router',
-        'pinia',
-        'axios'
-      ] : [],
-
       output: {
-        // CDN全局变量映射
-        globals: USE_CDN ? {
-          'vue': 'Vue',
-          'vue-router': 'VueRouter',
-          'pinia': 'Pinia',
-          'axios': 'axios'
-        } : {},
-
-        // 手动分包策略
+        // 手动分包策略 - 更细粒度的分割
         manualChunks: {
+          // Vue 核心
+          'vue-core': ['vue'],
+
+          // Vue 生态系统
+          'vue-ecosystem': ['vue-router', 'pinia'],
+
           // Element Plus UI 库
           'element-plus': ['element-plus'],
+
+          // 工具库
+          'utils': ['axios', 'dayjs'],
         },
 
         // 文件命名策略

@@ -9,15 +9,10 @@
     <title>电影资讯 - 发现精彩电影世界</title>
 
     <!-- DNS预解析优化 -->
-    <link rel="dns-prefetch" href="//unpkg.com">
     <link rel="dns-prefetch" href="//api.themoviedb.org">
     <link rel="dns-prefetch" href="//image.tmdb.org">
 
-    <!-- CDN预加载（生产环境注入） -->
-    <%- cdnPreload %>
-
     <!-- 性能优化 -->
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
     <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
   </head>
@@ -51,9 +46,6 @@
         }
       </style>
     </div>
-
-    <!-- CDN脚本（生产环境注入） -->
-    <%- cdnScripts %>
 
     <script type="module" src="/src/main.js"></script>
   </body>
