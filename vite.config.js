@@ -14,11 +14,11 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 const USE_CDN = process.env.NODE_ENV === 'production'
 
 const CDN_LINKS = USE_CDN ? [
-  // Cloudflare CDN - 全球最快的CDN网络
-  'https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.15/vue.global.prod.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/vue-router/4.2.5/vue-router.global.prod.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pinia/2.1.7/pinia.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js'
+  // UNPKG CDN - 更可靠的公共CDN
+  'https://unpkg.com/vue@3.4.15/dist/vue.global.prod.js',
+  'https://unpkg.com/vue-router@4.2.5/dist/vue-router.global.prod.js',
+  'https://unpkg.com/pinia@2.1.7/dist/pinia.iife.prod.js',
+  'https://unpkg.com/axios@1.6.5/dist/axios.min.js'
 ] : []
 
 // https://vite.dev/config/
