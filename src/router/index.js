@@ -10,39 +10,39 @@ const routes = [
   {
     path: '/movie/:id',
     name: 'MovieDetail',
-    component: () => import('@/views/MovieDetail.vue'),
+    component: () => import(/* webpackChunkName: "movie-detail" */ '@/views/MovieDetail.vue'),
     meta: { title: '电影详情' },
     props: true
   },
   {
     path: '/search',
     name: 'Search',
-    component: () => import('@/views/Search.vue'),
+    component: () => import(/* webpackChunkName: "search" */ '@/views/Search.vue'),
     meta: { title: '搜索' }
   },
   {
     path: '/category/:genre?',
     name: 'Category',
-    component: () => import('@/views/Category.vue'),
+    component: () => import(/* webpackChunkName: "category" */ '@/views/Category.vue'),
     meta: { title: '分类' },
     props: true
   },
   {
     path: '/favorites',
     name: 'Favorites',
-    component: () => import('@/views/Favorites.vue'),
+    component: () => import(/* webpackChunkName: "favorites" */ '@/views/Favorites.vue'),
     meta: { title: '我的收藏' }
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/views/About.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
     meta: { title: '关于' }
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFound.vue'),
+    component: () => import(/* webpackChunkName: "error" */ '@/views/NotFound.vue'),
     meta: { title: '页面未找到' }
   }
 ]
