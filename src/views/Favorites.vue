@@ -1,138 +1,99 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-slate-50">
     <div class="container-responsive py-8">
       <!-- 页面标题 -->
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">
-            我的收藏
-          </h1>
-          <p class="text-gray-600">
-            共收藏了 {{ userStore.favoritesCount }} 部电影
-          </p>
-        </div>
-
-        <!-- 清空收藏按钮 -->
-        <el-button
-          v-if="userStore.favoritesCount > 0"
-          type="danger"
-          :icon="Delete"
-          @click="handleClearAll"
-        >
-          清空收藏
-        </el-button>
-      </div>
-
-      <!-- 空状态 -->
-      <div
-        v-if="userStore.favoritesCount === 0"
-        class="text-center py-16"
-      >
-        <el-icon size="80" class="text-gray-300 mb-4">
-          <StarFilled />
-        </el-icon>
-        <h3 class="text-xl font-medium text-gray-500 mb-2">
-          还没有收藏的电影
-        </h3>
-        <p class="text-gray-400 mb-6">
-          去首页发现更多精彩电影吧
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">
+          我的收藏
+        </h1>
+        <p class="text-slate-600">
+          管理您收藏的电影和想看列表
         </p>
-        <el-button
-          type="primary"
-          size="large"
-          @click="$router.push('/')"
-        >
-          去首页看看
-        </el-button>
       </div>
 
-      <!-- 收藏列表 -->
-      <div
-        v-else
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
-      >
-        <div
-          v-for="movie in userStore.favorites"
-          :key="movie.id"
-          class="movie-card group cursor-pointer relative"
-          @click="goToMovie(movie.id)"
-        >
-          <!-- 海报图片 -->
-          <div class="relative overflow-hidden rounded-t-lg">
-            <img
-              v-if="movie.poster_path"
-              :src="getImageUrl(movie.poster_path, 'poster', 'medium')"
-              :alt="movie.title"
-              class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-              loading="lazy"
-            />
-            <div
-              v-else
-              class="w-full h-64 bg-gray-200 flex items-center justify-center"
-            >
-              <el-icon size="48" class="text-gray-400">
-                <Picture />
-              </el-icon>
-            </div>
+      <!-- 标签页 -->
+      <el-tabs v-model="activeTab" class="favorites-tabs">
+        <!-- 收藏列表 -->
+        <el-tab-pane label="收藏" name="favorites">
+          <template #label>
+            <span class="flex items-center">
+              <el-icon class="mr-1"><StarFilled /></el-icon>
+              收藏 ({{ userStore.favoritesCount }})
+            </span>
+          </template>
 
-            <!-- 评分标签 -->
-            <div
-              v-if="movie.vote_average"
-              class="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm font-medium"
+          <div class="mb-6 flex justify-between items-center">
+            <p class="text-slate-600">
+              共收藏了 {{ userStore.favoritesCount }} 部电影
+            </p>
+            <el-button
+              v-if="userStore.favoritesCount > 0"
+              type="danger"
+              :icon="Delete"
+              @click="handleClearFavorites"
             >
-              ⭐ {{ formatRating(movie.vote_average) }}
-            </div>
-
-            <!-- 移除收藏按钮 -->
-            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <el-button
-                type="danger"
-                :icon="Delete"
-                circle
-                size="small"
-                @click.stop="handleRemoveFavorite(movie)"
-              />
-            </div>
+              清空收藏
+            </el-button>
           </div>
 
-          <!-- 电影信息 -->
-          <div class="p-4 bg-white rounded-b-lg">
-            <h3
-              class="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors"
-              :title="movie.title"
+          <!-- 收藏电影列表 -->
+          <MovieGrid
+            :movies="userStore.favorites"
+            :empty-text="'还没有收藏的电影'"
+            :empty-description="'去首页发现更多精彩电影吧'"
+            @remove="handleRemoveFavorite"
+          />
+        </el-tab-pane>
+
+        <!-- 想看列表 -->
+        <el-tab-pane label="想看" name="watchlist">
+          <template #label>
+            <span class="flex items-center">
+              <el-icon class="mr-1"><View /></el-icon>
+              想看 ({{ userStore.watchListCount }})
+            </span>
+          </template>
+
+          <div class="mb-6 flex justify-between items-center">
+            <p class="text-slate-600">
+              共有 {{ userStore.watchListCount }} 部想看的电影
+            </p>
+            <el-button
+              v-if="userStore.watchListCount > 0"
+              type="danger"
+              :icon="Delete"
+              @click="handleClearWatchList"
             >
-              {{ movie.title }}
-            </h3>
-
-            <p class="text-gray-600 text-sm mb-2">
-              {{ formatDate(movie.release_date) }}
-            </p>
-
-            <p class="text-gray-500 text-xs">
-              收藏于 {{ formatDate(movie.addedAt) }}
-            </p>
+              清空想看
+            </el-button>
           </div>
-        </div>
-      </div>
+
+          <!-- 想看电影列表 -->
+          <MovieGrid
+            :movies="userStore.watchList"
+            :empty-text="'还没有想看的电影'"
+            :empty-description="'去首页发现更多精彩电影吧'"
+            @remove="handleRemoveFromWatchList"
+          />
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Delete, StarFilled, Picture } from '@element-plus/icons-vue'
+import { Delete, StarFilled, View } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/modules/user'
-import { getImageUrl, formatDate, formatRating } from '@/utils/helpers'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import MovieGrid from '@/components/movie/MovieGrid.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
+const activeTab = ref('favorites')
 
-// 方法
-const goToMovie = (movieId) => {
-  router.push({ name: 'MovieDetail', params: { id: movieId } })
-}
-
+// 移除收藏
 const handleRemoveFavorite = async (movie) => {
   try {
     await ElMessageBox.confirm(
@@ -146,13 +107,42 @@ const handleRemoveFavorite = async (movie) => {
     )
 
     userStore.removeFromFavorites(movie.id)
-    ElMessage.success('已从收藏中移除')
+    ElMessage({
+      message: '已从收藏中移除',
+      type: 'success',
+      duration: 2000
+    })
   } catch {
     // 用户取消操作
   }
 }
 
-const handleClearAll = async () => {
+// 移除想看
+const handleRemoveFromWatchList = async (movie) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要从想看列表中移除《${movie.title}》吗？`,
+      '确认移除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+
+    userStore.removeFromWatchList(movie.id)
+    ElMessage({
+      message: '已从想看列表中移除',
+      type: 'success',
+      duration: 2000
+    })
+  } catch {
+    // 用户取消操作
+  }
+}
+
+// 清空收藏
+const handleClearFavorites = async () => {
   try {
     await ElMessageBox.confirm(
       `确定要清空所有收藏吗？此操作不可恢复。`,
@@ -166,7 +156,36 @@ const handleClearAll = async () => {
 
     userStore.favorites.splice(0)
     userStore.syncToStorage('favorites')
-    ElMessage.success('已清空所有收藏')
+    ElMessage({
+      message: '已清空所有收藏',
+      type: 'success',
+      duration: 2000
+    })
+  } catch {
+    // 用户取消操作
+  }
+}
+
+// 清空想看列表
+const handleClearWatchList = async () => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要清空所有想看列表吗？此操作不可恢复。`,
+      '确认清空',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+
+    userStore.watchList.splice(0)
+    userStore.syncToStorage('watchList')
+    ElMessage({
+      message: '已清空想看列表',
+      type: 'success',
+      duration: 2000
+    })
   } catch {
     // 用户取消操作
   }
@@ -174,10 +193,26 @@ const handleClearAll = async () => {
 </script>
 
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.favorites-tabs :deep(.el-tabs__header) {
+  margin-bottom: 24px;
+}
+
+.favorites-tabs :deep(.el-tabs__nav-wrap) {
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.favorites-tabs :deep(.el-tabs__item) {
+  font-size: 16px;
+  font-weight: 500;
+  color: #64748b;
+  padding: 0 24px;
+}
+
+.favorites-tabs :deep(.el-tabs__item.is-active) {
+  color: #3b82f6;
+}
+
+.favorites-tabs :deep(.el-tabs__active-bar) {
+  background-color: #3b82f6;
 }
 </style>

@@ -233,16 +233,20 @@ const loadMovieDetail = async (id) => {
 
 const toggleFavorite = () => {
   userStore.toggleFavorite(movie.value)
-  ElMessage.success(
-    userStore.isFavorite(movie.value.id) ? '已添加到收藏' : '已从收藏中移除'
-  )
+  ElMessage({
+    message: userStore.isFavorite(movie.value.id) ? '已添加到收藏' : '已从收藏中移除',
+    type: 'success',
+    duration: 2000
+  })
 }
 
 const toggleWatchList = () => {
   userStore.toggleWatchList(movie.value)
-  ElMessage.success(
-    userStore.isInWatchList(movie.value.id) ? '已添加到想看列表' : '已从想看列表中移除'
-  )
+  ElMessage({
+    message: userStore.isInWatchList(movie.value.id) ? '已添加到想看列表' : '已从想看列表中移除',
+    type: 'success',
+    duration: 2000
+  })
 }
 
 const goToMovie = (id) => {
