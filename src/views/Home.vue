@@ -201,13 +201,33 @@ const goToGenre = (genreId) => {
 // 生命周期
 onMounted(async () => {
   try {
-    // 并行加载所有数据
-    await Promise.all([
-      movieStore.fetchPopularMovies(),
-      movieStore.fetchLatestMovies(),
-      movieStore.fetchUpcomingMovies(),
-      movieStore.fetchTopRatedMovies()
-    ])
+    // 优先加载热门电影（用于轮播图）
+    await movieStore.fetchPopularMovies()
+
+    // 延迟加载其他数据，减少移动端网络压力
+    setTimeout(async () => {
+      try {
+        await movieStore.fetchLatestMovies()
+      } catch (error) {
+        console.error('加载最新电影失败:', error)
+      }
+    }, 500)
+
+    setTimeout(async () => {
+      try {
+        await movieStore.fetchUpcomingMovies()
+      } catch (error) {
+        console.error('加载即将上映电影失败:', error)
+      }
+    }, 1000)
+
+    setTimeout(async () => {
+      try {
+        await movieStore.fetchTopRatedMovies()
+      } catch (error) {
+        console.error('加载高分电影失败:', error)
+      }
+    }, 1500)
   } catch (error) {
     console.error('加载首页数据失败:', error)
   }

@@ -7,6 +7,22 @@ const request = axios.create({
   timeout: REQUEST_TIMEOUT,
 })
 
+// 重试函数
+const retryRequest = async (config, retryCount = 3) => {
+  for (let i = 0; i < retryCount; i++) {
+    try {
+      const response = await axios(config)
+      return response
+    } catch (error) {
+      if (i === retryCount - 1) {
+        throw error
+      }
+      // 等待时间递增: 1s, 2s, 3s
+      await new Promise(resolve => setTimeout(resolve, (i + 1) * 1000))
+    }
+  }
+}
+
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
@@ -36,7 +52,20 @@ request.interceptors.response.use(
   (response) => {
     return response.data
   },
-  (error) => {
+  async (error) => {
+    // 网络超时或连接错误时自动重试
+    if (error.code === 'ECONNABORTED' || error.code === 'NETWORK_ERROR' ||
+        (error.response && error.response.status >= 500)) {
+      try {
+        console.log('网络请求失败，正在重试...', error.config.url)
+        const response = await retryRequest(error.config)
+        return response.data
+      } catch (retryError) {
+        console.error('重试失败:', retryError)
+        return Promise.reject(retryError)
+      }
+    }
+
     console.error('API请求错误:', error)
     return Promise.reject(error)
   }

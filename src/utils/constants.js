@@ -49,8 +49,8 @@ export const MOVIE_GENRES = {
   37: '西部',
 }
 
-// 请求超时时间
-export const REQUEST_TIMEOUT = 10000
+// 请求超时时间 (移动端网络优化)
+export const REQUEST_TIMEOUT = 20000
 
 // 分页配置
 export const PAGE_SIZE = 20
